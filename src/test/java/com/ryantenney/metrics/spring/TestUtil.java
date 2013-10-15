@@ -28,14 +28,13 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
-import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
 import com.ryantenney.metrics.annotation.Counted;
-import com.ryantenney.metrics.annotation.InjectMetric;
+import com.ryantenney.metrics.annotation.Metric;
 
 class TestUtil {
 
@@ -61,8 +60,8 @@ class TestUtil {
 		return Util.forCountedMethod(klass, member, annotation);
 	}
 
-	static String forInjectMetricField(Class<?> klass, Member member, InjectMetric annotation) {
-		return Util.forInjectMetricField(klass, member, annotation);
+	static String forMetricField(Class<?> klass, Member member, Metric annotation) {
+		return Util.forMetricField(klass, member, annotation);
 	}
 
 	static Gauge<?> forGaugeField(MetricRegistry metricRegistry, Class<?> clazz, String fieldName) {
@@ -107,9 +106,9 @@ class TestUtil {
 		return metricRegistry.getCounters().get(metricName);
 	}
 
-	static Metric forInjectMetricField(MetricRegistry metricRegistry, Class<?> clazz, String fieldName) {
+	static com.codahale.metrics.Metric forMetricField(MetricRegistry metricRegistry, Class<?> clazz, String fieldName) {
 		Field field = findField(clazz, fieldName);
-		String metricName = forInjectMetricField(clazz, field, field.getAnnotation(InjectMetric.class));
+		String metricName = forMetricField(clazz, field, field.getAnnotation(Metric.class));
 		log.info("Looking up injected metric field named '{}'", metricName);
 		Class<?> type = field.getType();
 		if (type.isAssignableFrom(Meter.class)) {

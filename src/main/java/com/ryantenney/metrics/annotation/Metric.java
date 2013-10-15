@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
  * <p/>
  * Given a field like this:
  * <pre><code>
- *     \@InjectMetric
+ *     \@Metric
  *     public Meter someTimer;
  * </code></pre>
  * <p/>
@@ -34,7 +34,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface InjectMetric {
+public @interface Metric {
 
 	/**
 	 * The name of the metric.

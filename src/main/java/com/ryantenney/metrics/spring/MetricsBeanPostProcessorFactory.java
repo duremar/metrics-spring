@@ -49,8 +49,8 @@ public class MetricsBeanPostProcessorFactory {
 		return new GaugeAnnotationBeanPostProcessor(metricRegistry);
 	}
 
-	public static InjectMetricAnnotationBeanPostProcessor injectMetric(final MetricRegistry metricRegistry) {
-		return new InjectMetricAnnotationBeanPostProcessor(metricRegistry);
+	public static MetricAnnotationBeanPostProcessor metric(final MetricRegistry metricRegistry) {
+		return new MetricAnnotationBeanPostProcessor(metricRegistry);
 	}
 
 	public static HealthCheckBeanPostProcessor healthCheck(final HealthCheckRegistry healthRegistry) {

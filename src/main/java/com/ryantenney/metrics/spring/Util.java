@@ -24,7 +24,7 @@ import com.codahale.metrics.annotation.Gauge;
 import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
 import com.ryantenney.metrics.annotation.Counted;
-import com.ryantenney.metrics.annotation.InjectMetric;
+import com.ryantenney.metrics.annotation.Metric;
 
 class Util {
 
@@ -51,7 +51,7 @@ class Util {
 		return chooseName(annotation.name(), annotation.absolute(), klass, member);
 	}
 
-	static String forInjectMetricField(Class<?> klass, Member member, InjectMetric annotation) {
+	static String forMetricField(Class<?> klass, Member member, Metric annotation) {
 		return chooseName(annotation.name(), annotation.absolute(), klass, member);
 	}
 

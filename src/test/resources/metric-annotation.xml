@@ -28,6 +28,6 @@
 
 	<metrics:annotation-driven />
 
-	<bean class="com.ryantenney.metrics.spring.InjectMetricTest.Target" />
+	<bean class="com.ryantenney.metrics.spring.MetricAnnotationTest.Target" />
 
 </beans>

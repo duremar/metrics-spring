@@ -28,20 +28,19 @@ import org.springframework.util.ReflectionUtils.FieldCallback;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
-import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.ryantenney.metrics.annotation.InjectMetric;
+import com.ryantenney.metrics.annotation.Metric;
 
-class InjectMetricAnnotationBeanPostProcessor implements BeanPostProcessor, Ordered {
+class MetricAnnotationBeanPostProcessor implements BeanPostProcessor, Ordered {
 
-	private static final Logger LOG = LoggerFactory.getLogger(InjectMetricAnnotationBeanPostProcessor.class);
+	private static final Logger LOG = LoggerFactory.getLogger(MetricAnnotationBeanPostProcessor.class);
 
-	private static final AnnotationFilter FILTER = new AnnotationFilter(InjectMetric.class);
+	private static final AnnotationFilter FILTER = new AnnotationFilter(Metric.class);
 
 	private final MetricRegistry metrics;
 
-	public InjectMetricAnnotationBeanPostProcessor(final MetricRegistry metrics) {
+	public MetricAnnotationBeanPostProcessor(final MetricRegistry metrics) {
 		this.metrics = metrics;
 	}
 
@@ -57,31 +56,42 @@ class InjectMetricAnnotationBeanPostProcessor implements BeanPostProcessor, Orde
 		ReflectionUtils.doWithFields(targetClass, new FieldCallback() {
 			@Override
 			public void doWith(Field field) throws IllegalAccessException {
-				final InjectMetric annotation = field.getAnnotation(InjectMetric.class);
-				final String metricName = Util.forInjectMetricField(targetClass, field, annotation);
+				ReflectionUtils.makeAccessible(field);
+
+				final Metric annotation = field.getAnnotation(Metric.class);
+				final String metricName = Util.forMetricField(targetClass, field, annotation);
 
 				final Class<?> type = field.getType();
-				Metric metric = null;
-				if (Meter.class == type) {
-					metric = metrics.meter(metricName);
+				if (!com.codahale.metrics.Metric.class.isAssignableFrom(type)) {
+					throw new RuntimeException(); // TODO
 				}
-				else if (Timer.class == type) {
-					metric = metrics.timer(metricName);
-				}
-				else if (Counter.class == type) {
-					metric = metrics.counter(metricName);
-				}
-				else if (Histogram.class == type) {
-					metric = metrics.histogram(metricName);
+
+				com.codahale.metrics.Metric metric = (com.codahale.metrics.Metric) ReflectionUtils.getField(field, bean);
+				if (metric == null) {
+					if (Meter.class == type) {
+						metric = metrics.meter(metricName);
+					}
+					else if (Timer.class == type) {
+						metric = metrics.timer(metricName);
+					}
+					else if (Counter.class == type) {
+						metric = metrics.counter(metricName);
+					}
+					else if (Histogram.class == type) {
+						metric = metrics.histogram(metricName);
+					}
+					else {
+						throw new IllegalStateException("Cannot inject a metric of type " + type.getCanonicalName());
+					}
+
+					ReflectionUtils.setField(field, bean, metric);
+
+					LOG.debug("Injected metric {} for field {}.{}", metricName, targetClass.getCanonicalName(), field.getName());
 				}
 				else {
-					throw new IllegalStateException("Cannot inject a metric of type " + type.getCanonicalName());
+					metrics.register(metricName, metric);
+					LOG.debug("Registered metric {} for field {}.{}", metricName, targetClass.getCanonicalName(), field.getName());
 				}
-
-				ReflectionUtils.makeAccessible(field);
-				ReflectionUtils.setField(field, bean, metric);
-
-				LOG.debug("Injected metric {} for field {}.{}", metricName, targetClass.getCanonicalName(), field.getName());
 			}
 		}, FILTER);
 

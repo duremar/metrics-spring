@@ -29,10 +29,10 @@ import com.codahale.metrics.SharedMetricRegistries;
 		DefaultRegistryTest.class,
 		EnableMetricsTest.class,
 		HealthCheckTest.class,
-		InjectMetricTest.class,
 		MeteredClassImpementsInterfaceTest.class,
 		MeteredClassTest.class,
 		MeteredInterfaceTest.class,
+		MetricAnnotationTest.class,
 		ProxyTargetClassTest.class,
 		ReporterTest.class,
 		SharedRegistryTest.class

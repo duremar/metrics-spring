@@ -93,7 +93,7 @@ public class MetricsConfigurationSupport implements ImportAware {
 	@Bean
 	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 	public BeanPostProcessor injectMetricAnnotationBeanPostProcessor() {
-		return MetricsBeanPostProcessorFactory.injectMetric(getMetricRegistry());
+		return MetricsBeanPostProcessorFactory.metric(getMetricRegistry());
 	}
 
 	@Bean
